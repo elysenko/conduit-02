@@ -1,0 +1,14 @@
+<nav class="bottom-nav" aria-label="Primary mobile">
+  @for (item of items(); track item.label) {
+    <a
+      class="tab"
+      [routerLink]="item.link"
+      [queryParams]="item.queryParams ?? null"
+      routerLinkActive="is-active"
+      [routerLinkActiveOptions]="{ exact: item.exact }"
+    >
+      <span class="tab-icon" aria-hidden="true">{{ item.icon }}</span>
+      <span class="tab-label">{{ item.label }}</span>
+    </a>
+  }
+</nav>

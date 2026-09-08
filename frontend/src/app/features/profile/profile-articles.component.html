@@ -1,0 +1,24 @@
+@if (loading()) {
+  <p class="state-block" data-testid="profile-articles-loading">Loading articles…</p>
+} @else if (error()) {
+  <p class="alert alert-error" data-testid="profile-articles-error">{{ error() }}</p>
+} @else if (visible().length === 0) {
+  <div class="panel state-block" data-testid="profile-articles-empty">
+    <p>No articles are here... yet.</p>
+    @if (!favoritedOnly) {
+      <a class="btn btn-outline" routerLink="/editor">Write the first one</a>
+    } @else {
+      <a class="btn btn-outline" routerLink="/">Browse the Global Feed</a>
+    }
+  </div>
+} @else {
+  <div data-testid="profile-article-list">
+    @for (article of visible(); track article.slug) {
+      <app-article-preview
+        [article]="article"
+        [canFavorite]="auth.isAuthenticated()"
+        (favoriteToggled)="toggleFavorite($event)"
+      />
+    }
+  </div>
+}

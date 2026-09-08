@@ -1,0 +1,57 @@
+<section class="profile-banner">
+  <div class="container banner-inner">
+    <img class="avatar profile-avatar" [src]="profile().image" alt="" width="96" height="96" />
+    <h1 class="profile-name">{{ profile().username }}</h1>
+    @if (profile().bio) {
+      <p class="profile-bio">{{ profile().bio }}</p>
+    } @else {
+      <p class="profile-bio profile-bio-empty">This author hasn't written a bio yet.</p>
+    }
+
+    <div class="profile-actions">
+      @if (isSelf()) {
+        <a class="btn btn-quiet btn-sm" routerLink="/settings">Edit profile settings</a>
+      } @else if (auth.isAuthenticated()) {
+        <button
+          class="btn btn-sm"
+          type="button"
+          [class.btn-primary]="!profile().following"
+          [class.btn-outline]="profile().following"
+          (click)="toggleFollow()"
+        >
+          {{ profile().following ? 'Unfollow' : 'Follow' }} {{ profile().username }}
+        </button>
+      } @else {
+        <a class="btn btn-outline btn-sm" routerLink="/login">Sign in to follow</a>
+      }
+    </div>
+  </div>
+</section>
+
+<div class="container page">
+  <div class="profile-tabs" role="tablist" aria-label="Profile article lists">
+    <a
+      class="tab"
+      role="tab"
+      routerLinkActive="is-active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      [routerLink]="['/profile', username()]"
+      >My Articles</a
+    >
+    <a
+      class="tab"
+      role="tab"
+      routerLinkActive="is-active"
+      [routerLink]="['/profile', username(), 'favorites']"
+      >Favorited Articles</a
+    >
+  </div>
+
+  @if (loading()) {
+    <p class="state-block" data-testid="profile-loading">Loading profile…</p>
+  } @else if (error()) {
+    <p class="alert alert-error" data-testid="profile-error">{{ error() }}</p>
+  } @else {
+    <router-outlet />
+  }
+</div>

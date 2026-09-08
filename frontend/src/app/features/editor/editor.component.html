@@ -1,0 +1,82 @@
+<div class="container page editor-page">
+  <div class="editor-card panel">
+    <h1 class="editor-title">{{ isEdit() ? 'Edit article' : 'New article' }}</h1>
+    <p class="editor-sub">
+      {{
+        isEdit()
+          ? 'Changes publish immediately. The article link stays the same.'
+          : 'Write something worth a second read.'
+      }}
+    </p>
+
+    @if (errors().length > 0) {
+      <ul class="alert alert-error" data-testid="editor-errors">
+        @for (message of errors(); track message) {
+          <li>{{ message }}</li>
+        }
+      </ul>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="field">
+        <label class="label" for="editor-title">Article title</label>
+        <input id="editor-title" class="input" type="text" formControlName="title" placeholder="How to train your dragon" />
+      </div>
+
+      <div class="field">
+        <label class="label" for="editor-description">What's this article about?</label>
+        <input
+          id="editor-description"
+          class="input"
+          type="text"
+          formControlName="description"
+          placeholder="One sentence a reader can skim"
+        />
+      </div>
+
+      <div class="field">
+        <label class="label" for="editor-body">Write your article</label>
+        <textarea id="editor-body" class="textarea" rows="10" formControlName="body" placeholder="Start writing…"></textarea>
+      </div>
+
+      <div class="field">
+        <label class="label" for="editor-tag">Tags</label>
+        <div class="tag-input-row">
+          <input
+            id="editor-tag"
+            class="input"
+            type="text"
+            placeholder="Add a tag and press Enter"
+            [ngModel]="tagDraft()"
+            (ngModelChange)="tagDraft.set($event)"
+            [ngModelOptions]="{ standalone: true }"
+            (keydown.enter)="$event.preventDefault(); addTag()"
+          />
+          <button class="btn btn-quiet" type="button" (click)="addTag()">Add</button>
+        </div>
+
+        @if (tags().length > 0) {
+          <ul class="tag-row">
+            @for (tag of tags(); track tag) {
+              <li>
+                <button class="tag tag-active" type="button" (click)="removeTag(tag)">
+                  {{ tag }} <span aria-hidden="true">✕</span>
+                  <span class="sr-only">Remove tag</span>
+                </button>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="hint">No tags yet — tags help readers find this in the Global Feed.</p>
+        }
+      </div>
+
+      <div class="editor-actions">
+        <button class="btn btn-quiet" type="button" (click)="cancel()">Cancel</button>
+        <button class="btn btn-primary" type="submit" [disabled]="submitting()">
+          {{ isEdit() ? 'Update article' : 'Publish article' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

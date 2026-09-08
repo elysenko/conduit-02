@@ -1,0 +1,64 @@
+<div class="container page admin-page">
+  <header class="admin-header">
+    <h1 class="admin-title">Admin Settings</h1>
+    <p class="admin-sub">
+      Credentials for the backing services this deployment was provisioned with.
+    </p>
+  </header>
+
+  @if (unconfigured().length > 0) {
+    <p class="alert alert-warning banner" data-testid="admin-unconfigured-banner">
+      The following need credentials to activate: {{ unconfiguredNames() }}
+    </p>
+  }
+
+  @if (loading()) {
+    <p class="state-block" data-testid="admin-loading">Loading settings…</p>
+  } @else if (error()) {
+    <p class="alert alert-error" data-testid="admin-error">{{ error() }}</p>
+  } @else if (services().length === 0) {
+    <p class="state-block" data-testid="admin-empty">No backing services are provisioned.</p>
+  } @else {
+    <div class="service-grid">
+      @for (service of services(); track service.service) {
+        <section class="panel service">
+          <header class="service-header">
+            <h2 class="service-name">{{ service.label }}</h2>
+            <span class="badge" [class.badge-on]="service.configured">
+              {{ service.configured ? 'Configured' : 'Needs credentials' }}
+            </span>
+          </header>
+          <p class="service-desc">{{ service.description }}</p>
+
+          @for (entry of service.keys; track entry.key) {
+            <div class="field">
+              <label class="label" [attr.for]="service.service + '-' + entry.key">
+                {{ entry.key }}
+              </label>
+              <input
+                class="input"
+                type="text"
+                spellcheck="false"
+                autocomplete="off"
+                [id]="service.service + '-' + entry.key"
+                [ngModel]="entry.value"
+                [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="updateValue(service.service, entry.key, $event)"
+                [placeholder]="'Set ' + entry.key"
+              />
+            </div>
+          }
+
+          <div class="service-actions">
+            @if (savedService() === service.service) {
+              <span class="saved-note">Saved</span>
+            }
+            <button class="btn btn-primary btn-sm" type="button" (click)="save(service.service)">
+              Save {{ service.label }}
+            </button>
+          </div>
+        </section>
+      }
+    </div>
+  }
+</div>

@@ -1,22 +1,156 @@
 {
   "_generated": true,
   "_scaffolded_at": "2026-09-08T05:37:00Z",
-  "fileBudget": { "maxLines": 400, "hardLimit": 500 },
+  "fileBudget": {
+    "maxLines": 400,
+    "hardLimit": 500
+  },
   "routes": [
-    { "method": "GET", "path": "/health" },
-    { "method": "GET", "path": "/trpc/users.findAll" },
-    { "method": "GET", "path": "/trpc/users.findById" }
+    {
+      "method": "GET",
+      "path": "/health"
+    },
+    {
+      "method": "GET",
+      "path": "/trpc/users.findAll"
+    },
+    {
+      "method": "GET",
+      "path": "/trpc/users.findById"
+    }
   ],
   "components": [
-    { "selector": "app-root", "file": "frontend/src/app/app.component.ts", "maxLines": 400 },
-    { "selector": "app-home", "file": "frontend/src/app/home/home.component.ts", "maxLines": 400 }
+    {
+      "selector": "app-root",
+      "file": "frontend/src/app/app.component.ts",
+      "maxLines": 400
+    },
+    {
+      "selector": "app-header",
+      "file": "frontend/src/app/layout/header.component.ts",
+      "maxLines": 400
+    },
+    {
+      "selector": "app-footer",
+      "file": "frontend/src/app/layout/footer.component.ts",
+      "maxLines": 400
+    },
+    {
+      "selector": "app-bottom-nav",
+      "file": "frontend/src/app/layout/bottom-nav.component.ts",
+      "maxLines": 400
+    },
+    {
+      "selector": "app-home",
+      "file": "frontend/src/app/features/home/home.component.ts",
+      "maxLines": 400
+    },
+    {
+      "selector": "app-article-preview",
+      "file": "frontend/src/app/features/article/article-preview.component.ts",
+      "maxLines": 400
+    },
+    {
+      "selector": "app-article-detail",
+      "file": "frontend/src/app/features/article/article-detail.component.ts",
+      "maxLines": 400
+    },
+    {
+      "selector": "app-comment-list",
+      "file": "frontend/src/app/features/article/comment-list.component.ts",
+      "maxLines": 400
+    },
+    {
+      "selector": "app-login",
+      "file": "frontend/src/app/features/auth/login.component.ts",
+      "maxLines": 400
+    },
+    {
+      "selector": "app-register",
+      "file": "frontend/src/app/features/auth/register.component.ts",
+      "maxLines": 400
+    },
+    {
+      "selector": "app-editor",
+      "file": "frontend/src/app/features/editor/editor.component.ts",
+      "maxLines": 400
+    },
+    {
+      "selector": "app-profile",
+      "file": "frontend/src/app/features/profile/profile.component.ts",
+      "maxLines": 400
+    },
+    {
+      "selector": "app-profile-articles",
+      "file": "frontend/src/app/features/profile/profile-articles.component.ts",
+      "maxLines": 400
+    },
+    {
+      "selector": "app-settings",
+      "file": "frontend/src/app/features/settings/settings.component.ts",
+      "maxLines": 400
+    },
+    {
+      "selector": "app-admin-settings",
+      "file": "frontend/src/app/features/admin/admin-settings.component.ts",
+      "maxLines": 400
+    }
   ],
   "testIds": [
-    { "id": "app-ready", "element": "div", "component": "app-root" },
-    { "id": "home-main", "element": "main", "component": "app-home" },
-    { "id": "home-title", "element": "h1", "component": "app-home" },
-    { "id": "users-loading", "element": "p", "component": "app-home" },
-    { "id": "users-error", "element": "p", "component": "app-home" },
-    { "id": "users-list", "element": "ul", "component": "app-home" }
+    {
+      "id": "app-ready",
+      "element": "div",
+      "component": "app-root"
+    },
+    {
+      "id": "article-list",
+      "element": "div",
+      "component": "app-home"
+    },
+    {
+      "id": "articles-loading",
+      "element": "p",
+      "component": "app-home"
+    },
+    {
+      "id": "articles-error",
+      "element": "p",
+      "component": "app-home"
+    },
+    {
+      "id": "articles-empty",
+      "element": "p",
+      "component": "app-home"
+    },
+    {
+      "id": "login-errors",
+      "element": "ul",
+      "component": "app-login"
+    },
+    {
+      "id": "register-errors",
+      "element": "ul",
+      "component": "app-register"
+    },
+    {
+      "id": "editor-errors",
+      "element": "ul",
+      "component": "app-editor"
+    },
+    {
+      "id": "comment-list",
+      "element": "ul",
+      "component": "app-comment-list"
+    },
+    {
+      "id": "settings-errors",
+      "element": "ul",
+      "component": "app-settings"
+    },
+    {
+      "id": "admin-unconfigured-banner",
+      "element": "p",
+      "component": "app-admin-settings"
+    }
   ]
 }

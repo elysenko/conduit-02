@@ -1,0 +1,40 @@
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" routerLink="/">Conduit</a>
+
+    <nav class="nav" aria-label="Primary">
+      <a
+        class="nav-link"
+        routerLink="/"
+        routerLinkActive="is-active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        >Home</a
+      >
+
+      @if (auth.isAuthenticated()) {
+        <a class="nav-link" routerLink="/editor" routerLinkActive="is-active">New Article</a>
+        <a class="nav-link" routerLink="/settings" routerLinkActive="is-active">Settings</a>
+        @if (auth.isAdmin()) {
+          <a class="nav-link" routerLink="/admin/settings" routerLinkActive="is-active">Admin</a>
+        }
+        <a
+          class="nav-link nav-user"
+          [routerLink]="['/profile', auth.currentUser()?.username]"
+          routerLinkActive="is-active"
+        >
+          <img
+            class="avatar"
+            [src]="auth.currentUser()?.image"
+            alt=""
+            width="26"
+            height="26"
+          />
+          <span>{{ auth.currentUser()?.username }}</span>
+        </a>
+      } @else {
+        <a class="nav-link" routerLink="/login" routerLinkActive="is-active">Sign in</a>
+        <a class="nav-link" routerLink="/register" routerLinkActive="is-active">Sign up</a>
+      }
+    </nav>
+  </div>
+</header>

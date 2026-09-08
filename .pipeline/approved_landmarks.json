@@ -1,0 +1,41 @@
+{
+  "testids": [
+    "admin-empty",
+    "admin-error",
+    "admin-loading",
+    "admin-unconfigured-banner",
+    "app-ready",
+    "article-error",
+    "article-list",
+    "article-loading",
+    "article-missing",
+    "articles-empty",
+    "articles-error",
+    "articles-loading",
+    "comment-list",
+    "comments-empty",
+    "comments-error",
+    "comments-loading",
+    "editor-errors",
+    "login-errors",
+    "profile-article-list",
+    "profile-articles-empty",
+    "profile-articles-error",
+    "profile-articles-loading",
+    "profile-error",
+    "profile-loading",
+    "register-errors",
+    "settings-errors",
+    "settings-saved"
+  ],
+  "headings": [
+    "Admin Settings",
+    "Conduit",
+    "Delete this article?",
+    "Popular Tags",
+    "Sign in",
+    "Sign up",
+    "Your Settings"
+  ],
+  "source_dir": "/workspace/mockups/42d97562-9cc6-5ad7-91f6-57340897bcef"
+}

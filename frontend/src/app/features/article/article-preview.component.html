@@ -1,0 +1,39 @@
+<article class="preview card">
+  <div class="preview-meta">
+    <a class="author-link" [routerLink]="['/profile', article().author.username]">
+      <img class="avatar" [src]="article().author.image" alt="" width="36" height="36" />
+      <span class="author-name">{{ article().author.username }}</span>
+    </a>
+    <span class="date">{{ formatDate(article().createdAt) }}</span>
+
+    @if (canFavorite()) {
+      <button
+        type="button"
+        class="btn btn-sm favorite"
+        [class.is-on]="article().favorited"
+        [attr.aria-pressed]="article().favorited"
+        (click)="favoriteToggled.emit(article())"
+      >
+        <span aria-hidden="true">♥</span>
+        <span>{{ article().favoritesCount }}</span>
+        <span class="sr-only">Favorite this article</span>
+      </button>
+    } @else {
+      <span class="favorite-count" title="Favorites">
+        <span aria-hidden="true">♥</span> {{ article().favoritesCount }}
+      </span>
+    }
+  </div>
+
+  <a class="preview-body" [routerLink]="['/article', article().slug]">
+    <h2 class="preview-title">{{ article().title }}</h2>
+    <p class="preview-description">{{ article().description }}</p>
+    <span class="read-more">Read more…</span>
+  </a>
+
+  <ul class="tag-row">
+    @for (tag of article().tagList; track tag) {
+      <li><span class="tag tag-outline">{{ tag }}</span></li>
+    }
+  </ul>
+</article>

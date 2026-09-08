@@ -1,0 +1,100 @@
+@if (loading()) {
+  <p class="state-block" data-testid="article-loading">Loading article…</p>
+} @else if (error()) {
+  <div class="container page">
+    <p class="alert alert-error" data-testid="article-error">{{ error() }}</p>
+  </div>
+} @else if (!article()) {
+  <div class="container page">
+    <div class="panel state-block" data-testid="article-missing">
+      <p>That article is no longer here.</p>
+      <a class="btn btn-outline" routerLink="/">Back to the Global Feed</a>
+    </div>
+  </div>
+} @else {
+  <article class="article">
+    <header class="article-banner">
+      <img class="cover" [src]="coverFor(article()!.slug)" alt="" width="800" height="240" />
+      <div class="container banner-content">
+        <h1 class="article-title">{{ article()!.title }}</h1>
+        <p class="article-description">{{ article()!.description }}</p>
+
+        <div class="meta-row">
+          <a class="author-link" [routerLink]="['/profile', article()!.author.username]">
+            <img class="avatar" [src]="article()!.author.image" alt="" width="40" height="40" />
+            <span class="author-block">
+              <span class="author-name">{{ article()!.author.username }}</span>
+              <span class="date">{{ formatDate(article()!.createdAt) }}</span>
+            </span>
+          </a>
+
+          @if (auth.isAuthenticated()) {
+            <div class="actions">
+              @if (isAuthor()) {
+                <a class="btn btn-sm btn-quiet" [routerLink]="['/editor', article()!.slug]">
+                  Edit article
+                </a>
+                <button class="btn btn-sm btn-danger" type="button" (click)="setModal('delete-confirm')">
+                  Delete article
+                </button>
+              } @else {
+                <button class="btn btn-sm btn-quiet" type="button" (click)="toggleFollow()">
+                  {{ article()!.author.following ? 'Unfollow' : 'Follow' }}
+                  {{ article()!.author.username }}
+                </button>
+                <button
+                  class="btn btn-sm"
+                  type="button"
+                  [class.btn-primary]="!article()!.favorited"
+                  [class.btn-outline]="article()!.favorited"
+                  (click)="toggleFavorite()"
+                >
+                  <span aria-hidden="true">♥</span>
+                  {{ article()!.favorited ? 'Unfavorite' : 'Favorite' }}
+                  ({{ article()!.favoritesCount }})
+                </button>
+              }
+            </div>
+          } @else {
+            <a class="btn btn-sm btn-outline actions" routerLink="/login">Sign in to favorite</a>
+          }
+        </div>
+      </div>
+    </header>
+
+    <div class="container page article-body">
+      @for (paragraph of paragraphs(); track $index) {
+        <p class="body-paragraph">{{ paragraph }}</p>
+      }
+
+      <ul class="tag-row">
+        @for (tag of article()!.tagList; track tag) {
+          <li>
+            <a class="tag tag-outline" routerLink="/" [queryParams]="{ tag: tag }">{{ tag }}</a>
+          </li>
+        }
+      </ul>
+
+      <hr class="divider" />
+
+      <app-comment-list [slug]="article()!.slug" />
+    </div>
+  </article>
+
+  @if (deleteOpen()) {
+    <div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="delete-title">
+      <div class="modal panel">
+        <h2 class="modal-title" id="delete-title">Delete this article?</h2>
+        <p class="modal-copy">
+          “{{ article()!.title }}” will be removed along with its comments. This cannot be undone.
+        </p>
+        <div class="modal-actions">
+          <button class="btn btn-quiet" type="button" (click)="setModal(null)">Cancel</button>
+          <button class="btn btn-danger" type="button" (click)="confirmDelete()">
+            Delete article
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+}

@@ -1,0 +1,109 @@
+<section class="banner">
+  <div class="container">
+    <h1 class="banner-title">Conduit</h1>
+    <p class="banner-subtitle">A place to share your knowledge.</p>
+  </div>
+</section>
+
+<div class="container page">
+  <div class="grid-sidebar">
+    <div class="feed-column">
+      <div class="tabs" role="tablist" aria-label="Article feeds">
+        @if (auth.isAuthenticated()) {
+          <button
+            type="button"
+            role="tab"
+            class="tab"
+            [class.is-active]="activeTab() === 'feed'"
+            [attr.aria-selected]="activeTab() === 'feed'"
+            (click)="selectTab('feed')"
+          >
+            Your Feed
+          </button>
+        }
+        <button
+          type="button"
+          role="tab"
+          class="tab"
+          [class.is-active]="activeTab() === 'global' && !activeTag()"
+          [attr.aria-selected]="activeTab() === 'global' && !activeTag()"
+          (click)="selectTab('global')"
+        >
+          Global Feed
+        </button>
+        @if (activeTag()) {
+          <button type="button" role="tab" class="tab is-active" aria-selected="true" (click)="selectTag(null)">
+            # {{ activeTag() }} ✕
+          </button>
+        }
+      </div>
+
+      @if (loading()) {
+        <p class="state-block" data-testid="articles-loading">Loading articles…</p>
+      } @else if (error()) {
+        <p class="state-block alert alert-error" data-testid="articles-error">{{ error() }}</p>
+      } @else if (visible().length === 0) {
+        <p class="state-block" data-testid="articles-empty">No articles are here... yet.</p>
+      } @else {
+        <div data-testid="article-list">
+          @for (article of visible(); track article.slug) {
+            <app-article-preview
+              [article]="article"
+              [canFavorite]="auth.isAuthenticated()"
+              (favoriteToggled)="toggleFavorite($event)"
+            />
+          }
+        </div>
+
+        @if (totalPages() > 1) {
+          <nav class="pagination" aria-label="Pagination">
+            @for (pageNumber of pages(); track pageNumber) {
+              <button
+                type="button"
+                class="page-btn"
+                [class.is-active]="pageNumber === page()"
+                [attr.aria-current]="pageNumber === page() ? 'page' : null"
+                (click)="goToPage(pageNumber)"
+              >
+                {{ pageNumber }}
+              </button>
+            }
+          </nav>
+        }
+      }
+    </div>
+
+    <aside class="sidebar panel" aria-label="Tags">
+      <h2 class="sidebar-title">Popular Tags</h2>
+      @if (tags().length === 0) {
+        <p class="state-block">No tags yet.</p>
+      } @else {
+        <ul class="tag-cloud">
+          @for (tag of tags(); track tag) {
+            <li>
+              <button
+                type="button"
+                class="tag"
+                [class.tag-active]="tag === activeTag()"
+                (click)="selectTag(tag)"
+              >
+                {{ tag }}
+              </button>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (!auth.isAuthenticated()) {
+        <div class="sidebar-cta">
+          <p class="sidebar-note">Sign in to build your own feed and publish articles.</p>
+          <a class="btn btn-primary btn-block" routerLink="/login">Sign in</a>
+        </div>
+      } @else {
+        <div class="sidebar-cta">
+          <a class="btn btn-primary btn-block" routerLink="/editor">Write an article</a>
+        </div>
+      }
+    </aside>
+  </div>
+</div>

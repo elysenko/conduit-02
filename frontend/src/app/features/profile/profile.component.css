@@ -1,0 +1,47 @@
+.profile-banner {
+  background: var(--color-surface-alt);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-6) 0;
+  text-align: center;
+}
+
+.banner-inner { display: flex; flex-direction: column; align-items: center; }
+
+.profile-avatar { width: 96px; height: 96px; margin-bottom: var(--space-3); }
+
+.profile-name {
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-1);
+}
+
+.profile-bio {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  max-width: 34rem;
+}
+
+.profile-bio-empty { color: var(--color-text-faint); font-style: italic; }
+
+.profile-actions { margin-top: var(--space-2); }
+
+.profile-tabs {
+  display: flex;
+  gap: var(--space-1);
+  border-bottom: 1px solid var(--color-border);
+  margin: var(--space-5) 0 var(--space-4);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border-bottom: 2px solid transparent;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.tab:active { background: var(--color-surface); }
+.tab.is-active { color: var(--color-brand); border-bottom-color: var(--color-brand); }

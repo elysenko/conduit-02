@@ -1,0 +1,78 @@
+<section class="comments" aria-labelledby="comments-heading">
+  <h2 class="comments-heading" id="comments-heading">
+    Comments <span class="count">({{ comments().length }})</span>
+  </h2>
+
+  @if (auth.isAuthenticated()) {
+    <form class="comment-form card" (ngSubmit)="post()">
+      <label class="sr-only" for="comment-body">Write a comment</label>
+      <textarea
+        id="comment-body"
+        class="textarea"
+        rows="3"
+        placeholder="Write a comment…"
+        [ngModel]="draft()"
+        (ngModelChange)="draft.set($event)"
+        name="body"
+      ></textarea>
+      <div class="comment-form-footer">
+        <img
+          class="avatar"
+          [src]="auth.currentUser()?.image"
+          alt=""
+          width="32"
+          height="32"
+        />
+        <button class="btn btn-primary btn-sm" type="submit" [disabled]="!draft().trim()">
+          Post comment
+        </button>
+      </div>
+    </form>
+  } @else {
+    <p class="signin-note">
+      <a routerLink="/login">Sign in</a> or <a routerLink="/register">sign up</a> to join the
+      conversation.
+    </p>
+  }
+
+  @if (loading()) {
+    <p class="state-block" data-testid="comments-loading">Loading comments…</p>
+  } @else if (error()) {
+    <p class="alert alert-error" data-testid="comments-error">{{ error() }}</p>
+  } @else if (comments().length === 0) {
+    <p class="state-block" data-testid="comments-empty">No comments yet. Start the discussion.</p>
+  } @else {
+    <ul class="comment-list" data-testid="comment-list">
+      @for (comment of comments(); track comment.id) {
+        <li class="comment card">
+          <p class="comment-body">{{ comment.body }}</p>
+          <div class="comment-meta">
+            <a class="author-link" [routerLink]="['/profile', comment.author.username]">
+              <img class="avatar" [src]="comment.author.image" alt="" width="28" height="28" />
+              <span class="author-name">{{ comment.author.username }}</span>
+            </a>
+            <span class="date">{{ formatDate(comment.createdAt) }}</span>
+            @if (isAuthor(comment)) {
+              <button class="btn btn-sm btn-quiet delete-btn" type="button" (click)="requestDelete(comment)">
+                Delete
+              </button>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (pendingDelete()) {
+    <div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="delete-comment-title">
+      <div class="modal panel">
+        <h3 class="modal-title" id="delete-comment-title">Delete this comment?</h3>
+        <p class="modal-copy">“{{ pendingDelete()!.body }}”</p>
+        <div class="modal-actions">
+          <button class="btn btn-quiet" type="button" (click)="dismissDelete()">Cancel</button>
+          <button class="btn btn-danger" type="button" (click)="confirmDelete()">Delete</button>
+        </div>
+      </div>
+    </div>
+  }
+</section>
