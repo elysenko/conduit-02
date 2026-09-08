@@ -7,15 +7,31 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Identity
+// ─────────────────────────────────────────────────────────────────────────────
+
 model User {
   id           String   @id @default(uuid())
   email        String   @unique
+  /// RealWorld public handle; appears in /profile/:username and every author envelope.
+  username     String   @unique
   name         String?
   /// bcryptjs hash (BCRYPT_ROUNDS in prisma/seed/seed.js and the auth service). Never store plaintext.
   passwordHash String
+  bio          String?
+  image        String?
   role         Role     @default(USER)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  articles  Article[]
+  comments  Comment[]
+  favorites Favorite[]
+  /// Users this user follows (rows where this user is the follower).
+  following Follow[]   @relation("UserFollowing")
+  /// Users who follow this user (rows where this user is the followed).
+  followers Follow[]   @relation("UserFollowers")
 }
 
 /// One value per role the stack contract declares (stacks/combos/enterprise.json auth.roles).
@@ -40,4 +56,109 @@ model ColossusAccount {
   updatedAt    DateTime @updatedAt @map("updated_at")
 
   @@map("colossus_accounts")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Content
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Article {
+  id          String   @id @default(cuid())
+  /// slugify(title) + "-" + 6-char base36 suffix; immutable across edits so links survive retitling.
+  slug        String   @unique
+  title       String
+  description String
+  body        String
+  authorId    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  author    User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments  Comment[]
+  tags      ArticleTag[]
+  favorites Favorite[]
+
+  @@index([authorId])
+  @@index([createdAt])
+}
+
+/// RealWorld comment ids are numeric in the API envelope ({comment:{id:number,…}}) and the
+/// Angular `Comment` model types `id: number` — autoincrement keeps the contract exact.
+model Comment {
+  id        Int      @id @default(autoincrement())
+  body      String
+  articleId String
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  author  User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([articleId])
+  @@index([authorId])
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  articles ArticleTag[]
+}
+
+/// Join model for Article ↔ Tag ("tagList" in the API envelope).
+model ArticleTag {
+  articleId String
+  tagId     String
+  createdAt DateTime @default(now())
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+  @@index([tagId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Social graph
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Join model backing `favorited` / `favoritesCount`.
+model Favorite {
+  userId    String
+  articleId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, articleId])
+  @@index([articleId])
+}
+
+/// Named self-relation on User backing `profile.following` and the personalised feed.
+model Follow {
+  followerId String
+  followedId String
+  createdAt  DateTime @default(now())
+
+  follower User @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  followed User @relation("UserFollowers", fields: [followedId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followedId])
+  @@index([followedId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Runtime configuration
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Runtime override layer for service credentials. resolveConfig() reads process.env first
+/// and falls back to this table; the ADMIN-only /api/admin/settings endpoints write it.
+model SystemSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
 }

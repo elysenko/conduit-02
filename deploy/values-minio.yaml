@@ -1,0 +1,24 @@
+# deploy/values-minio.yaml
+# Bitnami MinIO chart values for the live `minio` release (single-node S3 storage).
+# Credentials mirror the provisioned instance — do NOT regenerate them.
+#   helm upgrade --install minio bitnami/minio \
+#     -f deploy/values-minio.yaml -n colossus-conduit-02
+
+mode: standalone
+
+auth:
+  rootUser: "admin"
+  rootPassword: "0c71ZI4flKeoAHunogLVxC6i"
+
+defaultBuckets: "app-uploads"
+
+persistence:
+  size: 5Gi
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

@@ -26,6 +26,7 @@ const ACCOUNTS_ENV = 'COLOSSUS_ACCOUNTS_JSON';
 const BCRYPT_ROUNDS = 10;
 const DEFAULT_LOGIN_PATH = '/login';
 const REQUIRED_FIELDS = ['role', 'email', 'password'];
+const MAX_USERNAME_ATTEMPTS = 100;
 
 const prisma = new PrismaClient();
 
@@ -64,6 +65,36 @@ function resolveAppRole(contractRole) {
   return match;
 }
 
+/** Derive a slug-safe handle from the email local-part (never logged, never returned to callers). */
+function baseUsername(email) {
+  const local = String(email).split('@')[0] || '';
+  const cleaned = local
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]/g, '')
+    .replace(/^[._-]+|[._-]+$/g, '');
+  return cleaned || 'user';
+}
+
+/**
+ * Pick a `User.username` that is free, or already owned by this same email.
+ * `username` is @unique and required, so every created account needs one; a collision
+ * between two platform accounts (admin@a / admin@b) gets a numeric suffix.
+ */
+async function uniqueUsername(email) {
+  const base = baseUsername(email);
+  for (let suffix = 1; suffix <= MAX_USERNAME_ATTEMPTS; suffix += 1) {
+    const candidate = suffix === 1 ? base : `${base}${suffix}`;
+    const holder = await prisma.user.findUnique({
+      where: { username: candidate },
+      select: { email: true },
+    });
+    if (!holder || holder.email === email) {
+      return candidate;
+    }
+  }
+  throw new Error(`could not derive a unique username after ${MAX_USERNAME_ATTEMPTS} attempts`);
+}
+
 /** Upsert the colossus_accounts row and the matching User for one platform account. */
 async function upsertAccount(account) {
   const role = resolveAppRole(account.role);
@@ -74,10 +105,22 @@ async function upsertAccount(account) {
     update: { role: account.role, passwordHash, loginPath },
     create: { role: account.role, email: account.email, passwordHash, loginPath },
   });
+  // Preserve a handle the account may have chosen in Settings; only derive one on create.
+  const existing = await prisma.user.findUnique({
+    where: { email: account.email },
+    select: { username: true },
+  });
+  const username = existing ? existing.username : await uniqueUsername(account.email);
   await prisma.user.upsert({
     where: { email: account.email },
     update: { role, passwordHash },
-    create: { email: account.email, name: `${role} (Colossus)`, role, passwordHash },
+    create: {
+      email: account.email,
+      username,
+      name: `${role} (Colossus)`,
+      role,
+      passwordHash,
+    },
   });
   return role;
 }
